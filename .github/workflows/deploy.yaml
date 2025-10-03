@@ -1,0 +1,40 @@
+# Nama workflow Anda
+name: Deploy Astro site to Pages
+
+on:
+  # Jalankan workflow ini setiap kali ada 'push' ke branch 'main'
+  push:
+    branches: [ "main" ]
+
+  # Memungkinkan Anda menjalankan workflow ini secara manual dari tab Actions
+  workflow_dispatch:
+
+# Atur izin untuk GITHUB_TOKEN agar bisa melakukan deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repository
+        uses: actions/checkout@v4
+      - name: Install, build, and upload your site
+        uses: withastro/action@v2
+        # with:
+          # path: . # Lokasi folder proyek Astro Anda (jika tidak di root, sesuaikan di sini)
+          # node-version: 20 # Versi Node.js yang ingin digunakan
+          # package-manager: npm # Manajer paket yang Anda gunakan (npm, yarn, atau pnpm)
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
